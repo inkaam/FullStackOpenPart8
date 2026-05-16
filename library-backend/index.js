@@ -114,7 +114,7 @@ const typeDefs = /* GraphQL */ `
   type Query {
     bookCount: Int!
     authorCount: Int!
-    allBooks(author: String): [Book!]!
+    allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]
   }
 `;
@@ -124,12 +124,24 @@ const resolvers = {
     bookCount: () => books.length,
     authorCount: () => authors.length,
     allBooks: (root, args) => {
-      // jos argumenttina oleva ei löydy authoreista palautetaan kaikki kirjat
-      if (!args.author) {
-        return books;
+      // määritellään aluksi muuttujaan kaikki kirjat
+      let queriedBooks = books;
+
+      // jos argumenttina author, filteröidään kirjoista authorin mukaan
+      if (args.author) {
+        queriedBooks = queriedBooks.filter(
+          (book) => book.author === args.author,
+        );
       }
-      // muuten palautetaan annetun authorin kirjat
-      return books.filter((book) => book.author === args.author);
+
+      // jos argumenttina genre, filtteröidään genren mukaan
+      if (args.genre) {
+        queriedBooks = queriedBooks.filter((book) =>
+          book.genres.includes(args.genre),
+        );
+      }
+
+      return queriedBooks;
     },
     allAuthors: () => authors,
   },
