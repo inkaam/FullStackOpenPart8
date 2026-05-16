@@ -1,5 +1,6 @@
 const { ApolloServer } = require('@apollo/server');
 const { startStandaloneServer } = require('@apollo/server/standalone');
+const { v1: uuid } = require('uuid');
 
 let authors = [
   {
@@ -117,6 +118,15 @@ const typeDefs = /* GraphQL */ `
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]
   }
+
+  type Mutation {
+    addBook(
+      title: String!
+      published: Int!
+      author: String!
+      genres: [String]!
+    ): Book!
+  }
 `;
 
 const resolvers = {
@@ -149,6 +159,31 @@ const resolvers = {
     bookCount: (root) => {
       const authBooks = books.filter((book) => book.author === root.name);
       return authBooks.length;
+    },
+  },
+
+  Mutation: {
+    addBook: (root, args) => {
+      // katsotaan löytyykö author
+      const existingAuthor = authors.some(
+        (author) => author.name === args.author,
+      );
+      // luodan uusi kirja jos authoria ei löydy
+      if (!existingAuthor) {
+        const newAuthor = {
+          name: args.author,
+          id: uuid(),
+        };
+
+        authors = authors.concat(newAuthor);
+      }
+
+      const addedBook = {
+        ...args,
+        id: uuid(),
+      };
+      books = books.concat(addedBook);
+      return addedBook;
     },
   },
 };
