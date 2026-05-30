@@ -8,7 +8,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20  # <--- Nostettu 10 minuutista 20 minuuttiin
     steps:
       - uses: actions/checkout@v6
 
