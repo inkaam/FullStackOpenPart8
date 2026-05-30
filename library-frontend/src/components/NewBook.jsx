@@ -2,6 +2,25 @@ import { useMutation } from '@apollo/client/react';
 import { useState } from 'react';
 import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK } from '../queries';
 
+
+//// !!
+//
+// Kun ajoin uudestaan testejä test-chapter5 osiosta, tulee seuraava error:
+//
+// Error: expect(locator).toBeVisible() failed
+// Locator: getByText('Test Book')
+// Expected: visible
+// Error: strict mode violation: getByText('Test Book') resolved to 2 elements:
+//     1) <td>Test Book</td> aka getByRole('cell', { name: 'Test Book', exact: true })
+//     2) <td>Classic Test Book</td> aka getByRole('cell', { name: 'Classic Test Book' })
+
+// Call log:
+//   - Expect "toBeVisible" with timeout 5000ms
+//   - waiting for getByText('Test Book')
+//
+//Toimi ekalla kerralla ihan oikein, mutta kun ajoi uudestaa alkoi herjaamaan tuosta, eli testi vissiin tunnistaa
+// tosi herkästi samankaltaisen osion
+////
 const NewBook = (props) => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -20,7 +39,7 @@ const NewBook = (props) => {
   const submit = async (event) => {
     event.preventDefault();
 
-    createBook({
+    await createBook({
       variables: { title, published: Number(published), author, genres },
     });
 
@@ -29,8 +48,11 @@ const NewBook = (props) => {
     setAuthor('');
     setGenres([]);
     setGenre('');
-  };
 
+    if (props.setPage) {
+      props.setPage('books');
+    }
+  };
   const addGenre = () => {
     setGenres(genres.concat(genre));
     setGenre('');

@@ -14,19 +14,19 @@ const Authors = (props) => {
     return null;
   }
 
-  const authors = props.authors;
+  const authors = props.authors || [];
 
   const submit = async (event) => {
     event.preventDefault();
+    const authorName = name || (authors.length > 0 ? authors[0].name : '');
 
     changeBirthYear({
       variables: {
-        name,
+        name: authorName,
         setBornTo: Number(born),
       },
     });
 
-    setName('');
     setBorn('');
   };
   return (
@@ -50,38 +50,41 @@ const Authors = (props) => {
           </tbody>
         </table>
       </div>
-      <div>
-        <h3>Set birthday</h3>
-        <form onSubmit={submit}>
-          <div>
-            <label>
-              name
-              {/* select elementtiin kaikki authorien nimet */}
-              <select
-                value={name}
-                onChange={({ target }) => setName(target.value)}
-              >
-                {authors.map((a) => (
-                  <option key={a.id} value={a.name}>
-                    {a.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-          <div>
-            <label>
-              born
-              <input
-                type="number"
-                value={born}
-                onChange={({ target }) => setBorn(target.value)}
-              />
-            </label>
-          </div>
-          <button type="submit">update author</button>
-        </form>
-      </div>
+      {props.token && (
+        <div>
+          <h3>Set birthyear</h3>
+          <form onSubmit={submit}>
+            <div>
+              <label>
+                name
+                {/* select elementtiin kaikki authorien nimet */}
+                <select
+                  name="name"
+                  value={name}
+                  onChange={({ target }) => setName(target.value)}
+                >
+                  {authors.map((a) => (
+                    <option key={a.id} value={a.name}>
+                      {a.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <div>
+              <label>
+                born
+                <input
+                  type="number"
+                  value={born}
+                  onChange={({ target }) => setBorn(target.value)}
+                />
+              </label>
+            </div>
+            <button type="submit">update author</button>
+          </form>
+        </div>
+      )}
     </>
   );
 };
